@@ -1,0 +1,20 @@
+Creating Animated GIFs from videos
+Golang Vancouver meetup
+9 April 2014
+
+Gavin Bong
+raverunner@gmail.com
+@javouhey
+
+* Who is this guy ?
+
+- I am Java guy
+- I love animated GIFs
+
+* Overview
+
+This is a talk in two parts
+
+* Code
+
+.code van/hello.go /START OMIT/,/END OMIT/
