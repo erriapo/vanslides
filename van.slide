@@ -9,7 +9,7 @@ Gavin <raverunner@gmail.com>
 
 - seneca's mission statement 
 
-    Command line tool to generate animated gifs from youtube videos
+    Command line tool to generate small animated gifs from youtube videos
 
 - Cross-platform
 # I develop on ubuntu & test on windows
@@ -50,6 +50,8 @@ Gavin <raverunner@gmail.com>
      - order of arguments
      - even dimensions
 
+.image van/ffmpeg-logo.png
+
 * What's in an animated Gif ? (4 MB)
 
 .image kenyan.gif 170 290
@@ -69,7 +71,7 @@ Gavin <raverunner@gmail.com>
 
 * Costa Rican snake
 
-.code van/snake.go /START OMIT/,/END OMIT/
+.code van/snake.go 
 
 * seneca: Process of creation
 
@@ -79,8 +81,8 @@ Gavin <raverunner@gmail.com>
 
 2. Download mp4 / flv
 
-    youtube-dl -F <video_url>
-    youtube-dl -f 18 <video_url>
+    $ youtube-dl -F <video_url>
+    $ youtube-dl -f 18 <video_url>
 
 3. Trial & error until we get a reasonably sized GIF. Size depends on roughly 3 things.
 # Number of frames
@@ -153,6 +155,25 @@ Unicorn
     54 77 104 Completed
     72 91 120 Completed
     33 60 82 108 Completed
+
+* Lesson #4: code organization
+
+Ability to maintain a symbolic version:
+
+   $ seneca -version
+
+Output:
+
+   Seneca version 1.0.0-beta3, git SHA 4d95362aff7a9a5ab1b9cd677c272c10e3b52a09
+
+* Lesson #4: code organization (cont.)
+
+.image van/dir-mysources.png
+
+* Lesson #4: code organization (cont.)
+
+.image van/dir-src-symbolic-link.png
+
 
 * Mistakes a plenty
 
