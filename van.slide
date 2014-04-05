@@ -1,22 +1,166 @@
 Creating Animated GIFs
 Golang Vancouver meetup 
-9 April 2014
-Tags: go ffmpeg vancouver
+9 Apr 2014
 
-Gavin <raverunner@gmail.com> @javouhey
+Gavin <raverunner@gmail.com> 
+@javouhey
 
-* Who is this guy ?
+* Motivation
 
-- I am Java guy
-- I love animated GIFs
+- seneca's mission statement: 
 
-* Overview
+    Command line tool to generate animated gifs from youtube videos
 
-This is a talk in two parts
+- Cross-platform
+- Provides feedback to user (progress)
+- Simple _ffmpeg for humans_
+- Learn Go along the way
+- Lessons
+
+    - type safe Enums
+    - Channel cancelation
+    - empty structs
+    - package management
+    - goget-able projects
+
+* Gif 1 (681 KB)
+
+.link http://www.reddit.com/user/BigMurph26 www.reddit.com/user/BigMurph26
 
 .image snake-costa-rica.gif
+
+* Gif 2 (1.1 MB) 
+
+.link http://www.reddit.com/user/hbeckwith www.reddit.com/user/hbeckwith
+
+.image bladerunner.gif 
+
+* Gif 3 (1.6 MB)
+
+.link http://www.reddit.com/user/ARS_ www.reddit.com/user/ARS_
+
+.image buda.gif 450 800
+
+* How to create animated gifs
+
+- Imagemagick
+- gifsicle
+- *ffmpeg*
+   idiosyncrasies 
+     - stderr
+     - order of arguments
+
+* What's in an animated Gif ? (4 MB)
+
+.image kenyan.gif 170 290
+
+.link http://youtu.be/mTMgIViinuQ youtu.be/mTMgIViinuQ 
+
+    $ gifsicle -I moses-animated.gif
+    
+    36 images
+    logical screen 426x238
+    loop forever
+    + image #0 426x238 local color table [256]
+      disposal asis delay 0.05s
+    + image #1 426x238 local color table [256]
+      disposal asis delay 0.06s
+    ....snipped....
+
+* seneca: Process of creation
+
+1. Install seneca & ffmpeg
+
+.link https://github.com/javouhey/seneca github.com/javouhey/seneca
+
+2. Download mp4 / flv
+
+    youtube-dl -F <video_url>
+    youtube-dl -f 18 <video_url>
+
+3. Trial and error to get the smallest GIF. Size depends on roughly 3 things.
+# Number of frames
+# Dimensions of the frames
+# Color depth of each frame (8 bits max)
+
+    $ seneca -vv -dry-run -video-infile=moses.mp4
+
+    Video metadata
+    --------------
+       Duration: 145
+    Size  (wxh): 426x240
+    Fps (Hertz): 23.980000
+
+4. Optimize generated animated GIF using tools e.g. gifsicle
+
+* Changing speed (slow=3.7MB vs. veryfast=1.5MB)
+
+.image slower-3s-moses-18.gif 156 280 
+.code van/moses-slow.go HLspe
+
+.image veryfast-moses-18.gif 156 280
+.code van/moses-veryfast.go HLsp2
+
+* Lesson #1: empty struct
+
+- speed argument checker using a map
+
+* Scaling (4.9MB)
+
+.image zlatan.gif 200 290
+
+- Initial attempted at 6MB rejected by imgur.
+.code van/zlatan.go HLspe
+- The *_* placeholder tells ffmpeg to calculate that dimension.
+    -scale _:_     (means no scaling)
+    -scale 203:405 (INVALID to ffmpeg)
+
+* Lesson #2: Typed safe Enums
+
+Unicorn
+
+* Lesson #3: Building TCP services is a cinch
+
+- *Problem*: `ffmpeg` may take a long time to complete. Need progress indicator to keep the user notified.
+- *Solution*: `ffmpeg` accepts an argument `-progress http://host:port` & it will send one progress notification for every few frames processed.
+    POST / HTTP/1.1
+    Transfer-Encoding: chunked
+    User-Agent: Lavf/55.30.100
+    Host: localhost:8080
+
+    84
+    frame=0
+    drop_frames=0
+    progress=continue
+
+    ...snipped...
+
+    89
+    frame=108
+    drop_frames=103
+    progress=end
+
+* Lesson #3: (cont.)
+# why is it a pointer to channel. Can it be normal reference type ?
+.code van/progress.go 
+
+- One goroutine listens for `ffmpeg` pings & another prints it out.
+
+    54 77 104 Completed
+    72 91 120 Completed
+    33 60 82 108 Completed
+
+* Mistakes a plenty
+
+- Cross-platform functions only in `"path/filepath"`
+
+* Seneca demo
+
+.image buda-mine.gif
+
+- *Grand Budapest Hotel* movie trailer
+- Size: 4.2 MB
 
 * Code
 
 .code van/hello.go /START OMIT/,/END OMIT/
-

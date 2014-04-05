@@ -1,0 +1,7 @@
+./seneca -video-infile=/tmp/mar16/moses-18.mp4 -length 3s -from 00:01:00 -vv -fps 19 -scale 426:_ -speed=slower
+
+./seneca -video-infile=/tmp/mar16/moses-18.mp4 -length 7s -from 00:01:00 -vv -fps 19 -scale 426:_ -speed=veryfast
+
+
+-rw-rw-r-- 1 gavin gavin 3.7M Apr  4 21:19 slower-3s-moses-18.gif
+-rw-rw-r-- 1 gavin gavin 1.5M A
