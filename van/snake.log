@@ -1,4 +1,6 @@
-* snake-costa-rica.gif 39 images
+  $ gifsicle -I snake-costa-rica.gif
+
+  snake-costa-rica.gif 39 images
   logical screen 1000x482
   global color table [256]
   background 255
@@ -14,6 +16,7 @@
     disposal asis delay 0.04s
   + image #4 379x212 at 589,270 transparent 255
     disposal asis delay 0.04s
+// START OMIT
   + image #5 298x213 at 630,269 transparent 255
     disposal asis delay 0.04s
   + image #6 232x214 at 670,268 transparent 255
@@ -82,3 +85,4 @@
     disposal asis delay 0.04s
   + image #38 320x213 at 589,269 transparent 255
     disposal asis delay 0.04s
+// END OMIT

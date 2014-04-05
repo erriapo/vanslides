@@ -7,21 +7,20 @@ Gavin <raverunner@gmail.com>
 
 * Motivation
 
-- seneca's mission statement: 
+- seneca's mission statement 
 
     Command line tool to generate animated gifs from youtube videos
 
 - Cross-platform
-- Provides feedback to user (progress)
-- Simple _ffmpeg for humans_
-- Learn Go along the way
-- Lessons
+# I develop on ubuntu & test on windows
+- Gives progress feedback to user
+- Simple & naive
+- A few *lessons* from hacking with `seneca`:
 
-    - type safe Enums
-    - Channel cancelation
     - empty structs
-    - package management
-    - goget-able projects
+    - type safe Enums
+    - Channel cancellation
+    - Reproducible builds
 
 * Gif 1 (681 KB)
 
@@ -49,6 +48,7 @@ Gavin <raverunner@gmail.com>
    idiosyncrasies 
      - stderr
      - order of arguments
+     - even dimensions
 
 * What's in an animated Gif ? (4 MB)
 
@@ -67,6 +67,10 @@ Gavin <raverunner@gmail.com>
       disposal asis delay 0.06s
     ....snipped....
 
+* Costa Rican snake
+
+.code van/snake.go /START OMIT/,/END OMIT/
+
 * seneca: Process of creation
 
 1. Install seneca & ffmpeg
@@ -78,12 +82,12 @@ Gavin <raverunner@gmail.com>
     youtube-dl -F <video_url>
     youtube-dl -f 18 <video_url>
 
-3. Trial and error to get the smallest GIF. Size depends on roughly 3 things.
+3. Trial & error until we get a reasonably sized GIF. Size depends on roughly 3 things.
 # Number of frames
 # Dimensions of the frames
 # Color depth of each frame (8 bits max)
 
-    $ seneca -vv -dry-run -video-infile=moses.mp4
+    $ seneca -video-infile=moses.mp4 -from 00:01:00 -length 5s -vv -dry-run
 
     Video metadata
     --------------
@@ -111,7 +115,7 @@ Gavin <raverunner@gmail.com>
 
 - Initial attempted at 6MB rejected by imgur.
 .code van/zlatan.go HLspe
-- The *_* placeholder tells ffmpeg to calculate that dimension.
+- The *"_"* placeholder tells ffmpeg to calculate that dimension.
     -scale _:_     (means no scaling)
     -scale 203:405 (INVALID to ffmpeg)
 
@@ -121,8 +125,8 @@ Unicorn
 
 * Lesson #3: Building TCP services is a cinch
 
-- *Problem*: `ffmpeg` may take a long time to complete. Need progress indicator to keep the user notified.
-- *Solution*: `ffmpeg` accepts an argument `-progress http://host:port` & it will send one progress notification for every few frames processed.
+- *Problem*: `ffmpeg` may take a long time to complete.
+- *Solution*: `ffmpeg` accepts an argument `-progress http://host:port` & it will send a *ping* after every few frames are processed.
     POST / HTTP/1.1
     Transfer-Encoding: chunked
     User-Agent: Lavf/55.30.100
@@ -154,13 +158,26 @@ Unicorn
 
 - Cross-platform functions only in `"path/filepath"`
 
-* Seneca demo
+* seneca: Future
+
+.image eastwood.gif
+
+- Support for subtitles (via `libass` in ffmpeg)
+# Advanced Substation Alpha
+- auto-upload to _imgur.com_
+- run `gifsicle` in pipeline
+
+* Demo
 
 .image buda-mine.gif
 
-- *Grand Budapest Hotel* movie trailer
+.link http://imgur.com/ZjWEev6 imgur.com/ZjWEev6
 - Size: 4.2 MB
 
-* Code
+    C:\_programs\cygwin64\tmp\seneca-goget2\seneca\bin>
+    seneca -video-infile=C:\_programs\cygwin64\tmp\budapest.flv -vv 
+           -port 8181 -from 00:01:19 -length=4s -speed=slower 
+
+* Code (saved)
 
 .code van/hello.go /START OMIT/,/END OMIT/
