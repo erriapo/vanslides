@@ -9,7 +9,7 @@ Gavin <raverunner@gmail.com>
 
 - seneca's mission statement 
 
-    Command line tool to generate small animated gifs from youtube videos
+    Cli tool to generate small animated GIFs from youtube videos
 
 - Cross-platform
 # I develop on ubuntu & test on windows
@@ -22,19 +22,19 @@ Gavin <raverunner@gmail.com>
     - Channel cancellation
     - Reproducible builds
 
-* Gif 1 (681 KB)
+* GIF 1 (681 KB)
 
 .link http://www.reddit.com/user/BigMurph26 www.reddit.com/user/BigMurph26
 
 .image snake-costa-rica.gif
 
-* Gif 2 (1.1 MB) 
+* GIF 2 (1.1 MB) 
 
 .link http://www.reddit.com/user/hbeckwith www.reddit.com/user/hbeckwith
 
 .image bladerunner.gif 
 
-* Gif 3 (1.6 MB)
+* GIF 3 (1.6 MB)
 
 .link http://www.reddit.com/user/ARS_ www.reddit.com/user/ARS_
 
@@ -52,7 +52,7 @@ Gavin <raverunner@gmail.com>
 
 .image van/ffmpeg-logo.png
 
-* What's in an animated Gif ? (4 MB)
+* What's in an animated GIF ? (4 MB)
 
 .image kenyan.gif 170 290
 
@@ -77,11 +77,11 @@ Gavin <raverunner@gmail.com>
 
 1. Install seneca & ffmpeg
 
+.link http://ffmpeg.org/ ffmpeg.org
 .link https://github.com/javouhey/seneca github.com/javouhey/seneca
 
 2. Download mp4 / flv
 
-    $ youtube-dl -F <video_url>
     $ youtube-dl -f 18 <video_url>
 
 3. Trial & error until we get a reasonably sized GIF. Size depends on roughly 3 things.
@@ -125,14 +125,18 @@ Gavin <raverunner@gmail.com>
 
 Unicorn
 
-* Lesson #3: Building TCP services is a cinch
+* Lesson #3: Building HTTP servers is a cinch
 
-- *Problem*: `ffmpeg` may take a long time to complete.
-- *Solution*: `ffmpeg` accepts an argument `-progress http://host:port` & it will send a *ping* after every few frames are processed.
+- *Problem* `ffmpeg` may take a long time to complete.
+- *Solution*
+
+    $ ffmpeg -progress http://host:port ...
+
+Listen for pings:
+
     POST / HTTP/1.1
     Transfer-Encoding: chunked
     User-Agent: Lavf/55.30.100
-    Host: localhost:8080
 
     84
     frame=0
@@ -150,27 +154,104 @@ Unicorn
 # why is it a pointer to channel. Can it be normal reference type ?
 .code van/progress.go 
 
-- Listens for `ffmpeg` pings.
-- Writes to the channel.
+- *Responsibilities*: 
+- ... Listens for `ffmpeg` pings on port 8080 (default)
+- ... Forwards statuses to the Status Logger.
 
 * Lesson #3: Goroutine Status Logger (cont.)
 
 .code van/statuslogger.go 
 
-- Reads from the channel
-- Typical output
+- Output:
 
     54 77 104 Completed
     72 91 120 Completed
     33 60 82 108 Completed
 
 - It is not necessary to close channels. (_Discuss_)
-#do close the channel is some receivers are expecting it.
+#do close the channel iff some receivers are expecting it.
 - A closed channel can only be read from, writing to it panics. (_Discuss_) 
+#in seneca, I close the TCP listener first before closing the channel
+
+* Communicating with goroutines
+
+- `ffmpeg` pipeline
+
+.image van/pipeline.png 250 500
+
+- *goal* each stage is an executing goroutine
+- q1) How do I know if an error happened ?
+- q2) How do I wait for it to complete ?
+- q3) How to cancel a running goroutine ? 
+
+* Communicating with goroutines (cont.)
+
+- Stage 1: writes out frames to pngs (q1)
+
+    var (
+        task1    *io.FrameGenerator
+           vr    *io.VideoReader
+    )
+
+    reply := task1.Run(vr, args)
+    if err := <- reply; err != nil {
+        syscall.Exit(126)
+    }
+
+- method *Run* returns an unbuffered channel of type
+
+    <-chan error
+
+- Share memory by communicating
+
+* Communicating with goroutines (cont.)
+
+- Stage 2: libx264 encoding (q1 & q2)
+- Return error in an internal property.
+
+    type Muxer struct {
+        err error
+    }
+
+- method *Run* returns a `sync.WaitGroup`
+
+    var (
+        task2    *io.Muxer
+           vr    *io.VideoReader
+    )
+
+    wg := task2.Run(vr, args)
+    wg.Wait()
+    if err := task2.Error(); err != nil {
+        syscall.Exit(126)
+    }
 
 * Closing channel as signalling
 
-j
+alibabakk
+
+* Communicating with goroutines (cont.)
+
+- Stage 3: Stitching up the GIF
+- use the tomb package that encapsulates the goroutine signalling pattern
+
+    type GifWriter struct {
+        Tombstone tomb.Tomb
+    }
+
+- Cooperatively stop a running goroutine 
+
+    var task3    *io.GifWriter
+    task3.Run(vr, args)
+
+    time.Sleep(1 * time.Second)
+    log.Fatal(task3.Stop()) // calls tomb.Kill(nil)
+
+- Or wait for the result/error
+
+    if err := task3.Tombstone.Wait(); err != nil {
+        syscall.Exit(126)
+    }
 
 * Lesson #4: code organization
 
@@ -191,9 +272,14 @@ Output:
 .image van/dir-src-symbolic-link.png
 
 
-* Mistakes a plenty
+* Potpourri 
 
 - Cross-platform functions only in `"path/filepath"`
+- Should I `panic` ?
+- .. even when a package uses panic internally, its external API still presents explicit error return values.
+    func (b *Buffer) WriteString(s string) (n int, err error)
+- .. err is always nil. If the buffer becomes too large, WriteString will panic with ErrTooLarge. 
+- placeholder
 
 * seneca: Future
 
