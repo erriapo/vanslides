@@ -146,15 +146,31 @@ Unicorn
     drop_frames=103
     progress=end
 
-* Lesson #3: (cont.)
+* Lesson #3: Goroutine HTTP Listener (cont.)
 # why is it a pointer to channel. Can it be normal reference type ?
 .code van/progress.go 
 
-- One goroutine listens for `ffmpeg` pings & another prints it out.
+- Listens for `ffmpeg` pings.
+- Writes to the channel.
+
+* Lesson #3: Goroutine Status Logger (cont.)
+
+.code van/statuslogger.go 
+
+- Reads from the channel
+- Typical output
 
     54 77 104 Completed
     72 91 120 Completed
     33 60 82 108 Completed
+
+- It is not necessary to close channels. (_Discuss_)
+#do close the channel is some receivers are expecting it.
+- A closed channel can only be read from, writing to it panics. (_Discuss_) 
+
+* Closing channel as signalling
+
+j
 
 * Lesson #4: code organization
 
@@ -195,9 +211,8 @@ Output:
 .link http://imgur.com/ZjWEev6 imgur.com/ZjWEev6
 - Size: 4.2 MB
 
-    C:\_programs\cygwin64\tmp\seneca-goget2\seneca\bin>
-    seneca -video-infile=C:\_programs\cygwin64\tmp\budapest.flv -vv 
-           -port 8181 -from 00:01:19 -length=4s -speed=slower 
+    > seneca -video-infile=C:\_programs\cygwin64\tmp\budapest.flv -vv 
+             -port 8181 -from 00:01:19 -length=4s -speed=slower 
 
 * Code (saved)
 

@@ -4,6 +4,7 @@ type Status struct {
     progress string // HL
 }
 
+// Has a send-only channel
 type MyHandler struct {
-    notifyQueue *chan Status // HL
+    pings chan<- Status // HL
 }
