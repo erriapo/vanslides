@@ -283,6 +283,22 @@ Inspired by:
 
 ahah
 
+* Lesson #5: Put the version explicitly in the import path
+
+.link http://labix.org/gopkg.in labix.org/gopkg.in
+
+    go get gopkg.in/javouhey/iter.v4
+
+Look for branch/tag with v4.
+So if you release a new branch v4.2
+
+    go get -u gopkg.in/javouhey/iter.v4 
+
+will pull down the new changes. This is a contract that says your API
+was not changed.
+
+.code van/gopkg1.go
+
 * Potpourri 
 
 - Cross-platform functions only in `"path/filepath"`
