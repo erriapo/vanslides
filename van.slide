@@ -262,7 +262,8 @@ Output:
 
 - Desire #2: Reduce the size of the binary
 .link https://code.google.com/p/go/issues/detail?id=6853 Issue 6853 too big and growing
-.html van/size.html
+
+.image van/exe-size.png
 
 * Lesson #4: build process (cont.)
 
