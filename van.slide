@@ -4,6 +4,7 @@ Golang Vancouver meetup
 
 Gavin <raverunner@gmail.com> 
 @javouhey
+Hire me!
 
 * Motivation
 
@@ -172,6 +173,7 @@ Listen for pings:
 #do close the channel iff some receivers are expecting it.
 - A closed channel can only be read from, writing to it panics. (_Discuss_) 
 #in seneca, I close the TCP listener first before closing the channel
+#closing should be done by the sender, never the receiver.
 
 * Communicating with goroutines
 
@@ -179,35 +181,25 @@ Listen for pings:
 
 .image van/pipeline.png 250 500
 
-- *goal* each stage is an executing goroutine
+- *Goal* each stage is an executing goroutine
 - q1) How do I know if an error happened ?
 - q2) How do I wait for it to complete ?
 - q3) How to cancel a running goroutine ? 
 
 * Communicating with goroutines (cont.)
 
-- Stage 1: writes out frames to pngs (q1)
+- Stage 1: writes video frames to PNGs (q1 & q2)
 
-    var (
-        task1    *io.FrameGenerator
-           vr    *io.VideoReader
-    )
-
-    reply := task1.Run(vr, args)
-    if err := <- reply; err != nil {
-        syscall.Exit(126)
-    }
+.code van/task1.go
 
 - method *Run* returns an unbuffered channel of type
 
     <-chan error
 
-- Share memory by communicating
-
 * Communicating with goroutines (cont.)
 
-- Stage 2: libx264 encoding (q1 & q2)
-- Return error in an internal property.
+- Stage 2: h.264 encoding (q1 & q2)
+- Returns error in a field
 
     type Muxer struct {
         err error
@@ -215,20 +207,27 @@ Listen for pings:
 
 - method *Run* returns a `sync.WaitGroup`
 
-    var (
-        task2    *io.Muxer
-           vr    *io.VideoReader
-    )
-
-    wg := task2.Run(vr, args)
-    wg.Wait()
-    if err := task2.Error(); err != nil {
-        syscall.Exit(126)
-    }
+.code van/task2.go
 
 * Closing channel as signalling
 
-alibabakk
+- A receive operation on a closed channel never blocks.
+- For a closed channel *c*, `ok` is `false`:
+
+    x, ok := <- c
+
+- *Example*: generator of _even_ numbers
+# zero is even
+
+.code van/even1.go
+
+* Closing channel as signalling (cont.)
+
+.code van/even2.go
+
+Output
+
+.code van/even3.go
 
 * Communicating with goroutines (cont.)
 
@@ -253,9 +252,9 @@ alibabakk
         syscall.Exit(126)
     }
 
-* Lesson #4: code organization
+* Lesson #4: build process
 
-Ability to maintain a symbolic version:
+- Desire #1: Ability to maintain a symbolic version:
 
    $ seneca -version
 
@@ -263,14 +262,23 @@ Output:
 
    Seneca version 1.0.0-beta3, git SHA 4d95362aff7a9a5ab1b9cd677c272c10e3b52a09
 
-* Lesson #4: code organization (cont.)
+- Desire #2: Reduce the size of the binary
+.link https://code.google.com/p/go/issues/detail?id=6853 Issue 6853 too big and growing
+.html van/size.html
+
+* Lesson #4: build process (cont.)
 
 .image van/dir-mysources.png
 
-* Lesson #4: code organization (cont.)
+* Lesson #4: build process (cont.)
 
 .image van/dir-src-symbolic-link.png
 
+.code van/build.go
+
+Inspired by:
+
+.link https://github.com/coreos/etcd github.com/coreos/etcd
 
 * Potpourri 
 
@@ -283,7 +291,7 @@ Output:
 
 * seneca: Future
 
-.image eastwood.gif
+.image eastwood.gif 300 500
 
 - Support for subtitles (via `libass` in ffmpeg)
 # Advanced Substation Alpha
@@ -300,6 +308,4 @@ Output:
     > seneca -video-infile=C:\_programs\cygwin64\tmp\budapest.flv -vv 
              -port 8181 -from 00:01:19 -length=4s -speed=slower 
 
-* Code (saved)
-
-.code van/hello.go /START OMIT/,/END OMIT/
+# -from 00:01:15 -length=3s
