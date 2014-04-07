@@ -232,25 +232,23 @@ Output
 * Communicating with goroutines (cont.)
 
 - Stage 3: Stitching up the GIF
-- use the tomb package that encapsulates the goroutine signalling pattern
+- The `tomb` package encapsulates the goroutine signalling pattern
 
-    type GifWriter struct {
-        Tombstone tomb.Tomb
-    }
+.code van/tomb.go
+
+- wait for the completion
+
+.code van/tomb3.go
+
+* Communicating with goroutines (cont.)
 
 - Cooperatively stop a running goroutine 
 
-    var task3    *io.GifWriter
-    task3.Run(vr, args)
+.code van/tomb4.go
 
-    time.Sleep(1 * time.Second)
-    log.Fatal(task3.Stop()) // calls tomb.Kill(nil)
+- Check for the cancellation signal
 
-- Or wait for the result/error
-
-    if err := task3.Tombstone.Wait(); err != nil {
-        syscall.Exit(126)
-    }
+.code van/tomb2.go
 
 * Lesson #4: build process
 
@@ -279,6 +277,10 @@ Output:
 Inspired by:
 
 .link https://github.com/coreos/etcd github.com/coreos/etcd
+
+* Lesson #5: Reproducible builds
+
+ahah
 
 * Potpourri 
 
