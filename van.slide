@@ -10,20 +10,20 @@ Hire me!
 
 - seneca's mission statement 
 
-    CLI tool to generate small animated GIFs from youtube videos for uploading to imgur.com
+    Generate small animated GIFs from youtube videos
 
 - Cross-platform
 # I develop on ubuntu & test on windows
-- Gives progress feedback to user
+- Visual feedback
 - Simple & naive
-- A few *lessons* from hacking with `seneca`:
+- *Lessons* to share:
 
     - empty structs
     - type safe Enums
     - Channel cancellation
     - Reproducible builds
 
-* GIF 1 (681 KB)
+* GIF 1 (~681 KB)
 
 .link http://www.reddit.com/user/BigMurph26 www.reddit.com/user/BigMurph26
 
@@ -70,15 +70,15 @@ Hire me!
       disposal asis delay 0.06s
     ....snipped....
 
-* Costa Rican snake
+* Costa Rican snake (~681 KB)
 
 .code van/snake.go 
 
-* seneca: Process of creation
+* seneca: 3-step process
 
 1. Install seneca & ffmpeg
 
-.link http://ffmpeg.org/ ffmpeg.org
+.link http://ffmpeg.org/ ffmpeg 2.1.4
 .link https://github.com/javouhey/seneca github.com/javouhey/seneca
 
 2. Download mp4 / flv
@@ -97,8 +97,9 @@ Hire me!
        Duration: 145
     Size  (wxh): 426x240
     Fps (Hertz): 23.980000
+    ... snipped ...
 
-4. Optimize generated animated GIF using tools e.g. gifsicle
+#Extra step: Optimize generated animated GIF using tools e.g. gifsicle
 
 * Changing speed (slow=3.7MB vs. veryfast=1.5MB)
 
@@ -193,7 +194,7 @@ Listen for pings:
 
 .code van/task1.go
 
-- method *Run* returns an unbuffered channel of type
+- `Run` returns an unbuffered channel
 
     <-chan error
 
@@ -206,7 +207,7 @@ Listen for pings:
         err error
     }
 
-- method *Run* returns a `*sync.WaitGroup`
+- `Run` returns a `*sync.WaitGroup`
 #WaitGroup is a struct and behaves like a counting semaphore
 
 .code van/task2.go
@@ -263,7 +264,7 @@ Output:
    Seneca version 1.0.0-beta3, git SHA 4d95362aff7a9a5ab1b9cd677c272c10e3b52a09
 
 - Want: Reduction in the size of the binary
-.link https://code.google.com/p/go/issues/detail?id=6853 Issue 6853 Binaries too big and growing
+.link https://code.google.com/p/go/issues/detail?id=6853 Issue #6853 : Binaries too big and growing
 # tagged for go1.4
 
 .image van/exe-size.png
@@ -271,6 +272,10 @@ Output:
 * Lesson #4: build process (cont.)
 
 .image van/dir-mysources.png
+
+This still *works* but ...
+
+    $ go get -x github.com/javouhey/seneca
 
 * Lesson #4: build process (cont.)
 
@@ -310,7 +315,7 @@ will pull down the new fixes/improvement to `v4` (stable API)
 
 .code van/gopkg1.go
 
-*Limitation:* Github hosted packages only
+*Constraint* Github hosted packages only
 
 * Lesson #5: Git submodules
 
@@ -339,8 +344,7 @@ Take 3rd party code & check it into your project's repo.
     )
 
 - These projects vendor their dependencies.
-    github.com/dotcloud/docker
-    github.com/coreos/etcd
+    dotcloud/docker    coreos/etcd    bradfitz/camlistore
 
 * Potpourri 
 
@@ -358,7 +362,7 @@ Take 3rd party code & check it into your project's repo.
 
 .image eastwood.gif 250 426
 
-- Support for subtitles (via `libass` in ffmpeg)
+- Support subtitling (via `libass` in `ffmpeg`)
 # Advanced Substation Alpha
 - auto-upload
 
