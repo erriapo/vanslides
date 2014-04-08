@@ -10,7 +10,7 @@ Hire me!
 
 - seneca's mission statement 
 
-    Cli tool to generate small animated GIFs from youtube videos
+    CLI tool to generate small animated GIFs from youtube videos for uploading to imgur.com
 
 - Cross-platform
 # I develop on ubuntu & test on windows
@@ -116,11 +116,12 @@ Hire me!
 
 .image zlatan.gif 200 290
 
-- Initial attempted at 6MB rejected by imgur.
+- 6MB file rejected by imgur.
 .code van/zlatan.go HLspe
-- The *"_"* placeholder tells ffmpeg to calculate that dimension.
+- The *"_"* placeholder inspired by `Go`
     -scale _:_     (means no scaling)
-    -scale 203:405 (INVALID to ffmpeg)
+    -scale 203:405 (INVALID)
+# libx264 encoder only accepts even dimensions.
 
 * Lesson #2: Typed safe Enums
 
@@ -156,8 +157,8 @@ Listen for pings:
 .code van/progress.go 
 
 - *Responsibilities*: 
-- ... Listens for `ffmpeg` pings on port 8080 (default)
-- ... Forwards statuses to the Status Logger.
+- _Listens for `ffmpeg` pings on port 8080 (default)
+- _Forwards statuses to the Status Logger.
 
 * Lesson #3: Goroutine Status Logger (cont.)
 
@@ -205,7 +206,8 @@ Listen for pings:
         err error
     }
 
-- method *Run* returns a `sync.WaitGroup`
+- method *Run* returns a `*sync.WaitGroup`
+#WaitGroup is a struct and behaves like a counting semaphore
 
 .code van/task2.go
 
@@ -231,7 +233,7 @@ Output
 
 * Communicating with goroutines (cont.)
 
-- Stage 3: Stitching up the GIF
+- Stage 3: MP4 to GIF
 - The `tomb` package encapsulates the goroutine signalling pattern
 
 .code van/tomb.go
@@ -252,7 +254,7 @@ Output
 
 * Lesson #4: build process
 
-- Desire #1: Ability to maintain a symbolic version:
+- Want: Ability to maintain a symbolic version:
 
    $ seneca -version
 
@@ -260,8 +262,9 @@ Output:
 
    Seneca version 1.0.0-beta3, git SHA 4d95362aff7a9a5ab1b9cd677c272c10e3b52a09
 
-- Desire #2: Reduce the size of the binary
-.link https://code.google.com/p/go/issues/detail?id=6853 Issue 6853 too big and growing
+- Want: Reduction in the size of the binary
+.link https://code.google.com/p/go/issues/detail?id=6853 Issue 6853 Binaries too big and growing
+# tagged for go1.4
 
 .image van/exe-size.png
 
@@ -281,25 +284,68 @@ Inspired by:
 
 * Lesson #5: Reproducible builds
 
-ahah
+.link https://groups.google.com/forum/#!msg/golang-nuts/2Xluuq6hmc4/AeJRu8f0R7wJ source
+.code van/versioning.go
+
+- Tip of default branch always pristine ?
+- 12-factor app rule:
+
+    Explicitly declare and isolate dependencies 
+
+.link http://12factor.net/dependencies 12factor.net/dependencies
 
 * Lesson #5: Put the version explicitly in the import path
 
 .link http://labix.org/gopkg.in labix.org/gopkg.in
 
+Download a branch/tag for `iter` named v4
+
     go get gopkg.in/javouhey/iter.v4
 
-Look for branch/tag with v4.
-So if you release a new branch v4.2
+A new branch `v4.2` is released
 
     go get -u gopkg.in/javouhey/iter.v4 
 
-will pull down the new changes. This is a contract that says your API
-was not changed.
+will pull down the new fixes/improvement to `v4` (stable API)
 
 .code van/gopkg1.go
 
+*Limitation:* Github hosted packages only
+
+* Lesson #5: Git submodules
+
+- Pins the submodule to the current *HEAD* of default branch
+
+    $ git submodule add https://github.com/stretchr/testify.git 
+                        vendor/github.com/stretchr/testify
+
+- Reproducible (detached HEAD):
+
+.code van/submodule.go
+
+- Git >= 1.8.2 can make submodules track upstream branches.
+
+    $ git submodule update vendor/github.com/stretchr/testify
+
+* Lesson #5: Vendor 
+
+Take 3rd party code & check it into your project's repo.
+
+.image van/dir-vendor.png 180 400
+
+    import (
+        "github.com/javouhey/seneca/vendor/launchpad.net/tomb"
+        "github.com/javouhey/seneca/vendor/labix.org/v2/pipe"
+    )
+
+- These projects vendor their dependencies.
+    github.com/dotcloud/docker
+    github.com/coreos/etcd
+
 * Potpourri 
+
+- Mistakes made: Return sync.WaitGroup instead of *sync.WaitGroup
+  https://groups.google.com/forum/#!topic/golang-nuts/yF1plSkha5w
 
 - Cross-platform functions only in `"path/filepath"`
 - Should I `panic` ?
@@ -310,11 +356,14 @@ was not changed.
 
 * seneca: Future
 
-.image eastwood.gif 300 500
+.image eastwood.gif 250 426
 
 - Support for subtitles (via `libass` in ffmpeg)
 # Advanced Substation Alpha
-- auto-upload to _imgur.com_
+- auto-upload
+
+.link http://imgur.com/ imgur.com
+
 - run `gifsicle` in pipeline
 
 * Demo
