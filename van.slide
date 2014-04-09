@@ -111,7 +111,35 @@ Hire me!
 
 * Lesson #1: empty struct
 
-- speed argument checker using a map
+Problem: modelling a set of values
+
+.code van/speed1.go
+
+* Lesson #1: empty struct (cont.)
+
+An empty struct has zero memory allocations.
+
+.code van/speed2.go
+
+Two different interpretation:
+
+- `interface{}` stands for the concept of `Any`
+- `struct{}` stands for the concept of `Nothing`
+
+* Lesson #1: empty struct (cont.)
+
+Next incarnation of my map:
+
+.code van/speed3.go
+
+More idiomatic:
+
+    var speeds = map[string]bool { ... }
+
+    arg := "placebo"
+    if speeds[arg] {
+        // arg exists in `speeds`
+    }
 
 * Scaling (4.9MB)
 
@@ -163,7 +191,6 @@ Solution: implement range checks for the type of your constants.
 * Lesson #3: Building HTTP servers is a cinch
 
 - *Problem* `ffmpeg` may take a long time to complete.
-- *Solution*
 
     $ ffmpeg -progress http://host:port ...
 
@@ -176,8 +203,8 @@ Listen for pings:
 .code van/progress.go 
 
 - *Responsibilities*: 
-- _Listens for `ffmpeg` pings on port 8080 (default)
-- _Forwards statuses to the Status Logger.
+- a) Listens for `ffmpeg` pings on port 8080 (default)
+- b) Forwards statuses to the Status Logger.
 
 * Lesson #3: Goroutine Status Logger (cont.)
 
