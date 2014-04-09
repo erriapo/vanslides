@@ -18,8 +18,8 @@ Hire me!
 - Simple & naive
 - *Lessons* to share:
 
-    - empty structs
-    - type safe Enums
+    - Empty structs
+    - Type-safe Enums
     - Channel cancellation
     - Reproducible builds
 
@@ -119,14 +119,46 @@ Hire me!
 
 - 6MB file rejected by imgur.
 .code van/zlatan.go HLspe
-- The *"_"* placeholder inspired by `Go`
-    -scale _:_     (means no scaling)
+- The *_* placeholder inspired by `Go`
+    -scale _:_     
     -scale 203:405 (INVALID)
 # libx264 encoder only accepts even dimensions.
 
-* Lesson #2: Typed safe Enums
+* Lesson #2: Type-safe Enums
 
-Unicorn
+- Go does not have type-safe enums. 
+
+.code van/scale.go
+
+    fmt.Printf("%d %d %d", WidthOnly, HeightOnly, WidthHeight)
+
+Output
+
+    1 2 4
+
+* Lesson #2: Type-safe Enums (cont.)
+
+.code van/scale2.go
+
+- This does not limit the scope of values:
+
+    Rescale(1)
+    Rescale(WidthOnly)
+    Rescale(99)
+
+Output
+
+    1
+    1
+    99
+
+* Lesson #2: Type-safe Enums (cont.)
+
+Solution: implement range checks for the type of your constants.
+
+.code van/scalefix.go
+
+.link http://play.golang.org/p/zlpORmC3u1 play.golang.org/p/zlpORmC3u1
 
 * Lesson #3: Building HTTP servers is a cinch
 
@@ -137,21 +169,7 @@ Unicorn
 
 Listen for pings:
 
-    POST / HTTP/1.1
-    Transfer-Encoding: chunked
-    User-Agent: Lavf/55.30.100
-
-    84
-    frame=0
-    drop_frames=0
-    progress=continue
-
-    ...snipped...
-
-    89
-    frame=108
-    drop_frames=103
-    progress=end
+.code van/pings.go
 
 * Lesson #3: Goroutine HTTP Listener (cont.)
 # why is it a pointer to channel. Can it be normal reference type ?
@@ -176,6 +194,12 @@ Listen for pings:
 - A closed channel can only be read from, writing to it panics. (_Discuss_) 
 #in seneca, I close the TCP listener first before closing the channel
 #closing should be done by the sender, never the receiver.
+
+* Interlude
+
+.link http://www.reddit.com/user/BigMurph26 www.reddit.com/user/BigMurph26
+
+.image y0yUSUL-iceland.gif 310 800
 
 * Communicating with goroutines
 
@@ -253,9 +277,10 @@ Output
 
 .code van/tomb2.go
 
+
 * Lesson #4: build process
 
-- Want: Ability to maintain a symbolic version:
+- Maintain a symbolic version:
 
    $ seneca -version
 
@@ -263,7 +288,7 @@ Output:
 
    Seneca version 1.0.0-beta3, git SHA 4d95362aff7a9a5ab1b9cd677c272c10e3b52a09
 
-- Want: Reduction in the size of the binary
+- Smaller binary size 
 .link https://code.google.com/p/go/issues/detail?id=6853 Issue #6853 : Binaries too big and growing
 # tagged for go1.4
 
@@ -282,10 +307,15 @@ This still *works* but ...
 .image van/dir-src-symbolic-link.png
 
 .code van/build.go
+# -w removes the DWARF information which allows for debugging
 
 Inspired by:
 
 .link https://github.com/coreos/etcd github.com/coreos/etcd
+
+* Interlude
+
+.image NataliaPoklonskaya-Ukraine-AG.gif 400 650
 
 * Lesson #5: Reproducible builds
 
@@ -295,9 +325,10 @@ Inspired by:
 - Tip of default branch always pristine ?
 - 12-factor app rule:
 
+.link http://12factor.net/dependencies 12factor.net/dependencies
+
     Explicitly declare and isolate dependencies 
 
-.link http://12factor.net/dependencies 12factor.net/dependencies
 
 * Lesson #5: Put the version explicitly in the import path
 
@@ -345,18 +376,6 @@ Take 3rd party code & check it into your project's repo.
 
 - These projects vendor their dependencies.
     dotcloud/docker    coreos/etcd    bradfitz/camlistore
-
-* Potpourri 
-
-- Mistakes made: Return sync.WaitGroup instead of *sync.WaitGroup
-  https://groups.google.com/forum/#!topic/golang-nuts/yF1plSkha5w
-
-- Cross-platform functions only in `"path/filepath"`
-- Should I `panic` ?
-- .. even when a package uses panic internally, its external API still presents explicit error return values.
-    func (b *Buffer) WriteString(s string) (n int, err error)
-- .. err is always nil. If the buffer becomes too large, WriteString will panic with ErrTooLarge. 
-- placeholder
 
 * seneca: Future
 
