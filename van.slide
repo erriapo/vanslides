@@ -10,20 +10,20 @@ Hire me!
 
 - seneca's mission statement 
 
-    CLI tool to generate small animated GIFs from youtube videos for uploading to imgur.com
+    Generate small animated GIFs from youtube videos
 
 - Cross-platform
 # I develop on ubuntu & test on windows
-- Gives progress feedback to user
+- Visual feedback
 - Simple & naive
-- A few *lessons* from hacking with `seneca`:
+- *Lessons* to share:
 
-    - empty structs
-    - type safe Enums
+    - Empty structs
+    - Type-safe Enums
     - Channel cancellation
     - Reproducible builds
 
-* GIF 1 (681 KB)
+* GIF 1 (~681 KB)
 
 .link http://www.reddit.com/user/BigMurph26 www.reddit.com/user/BigMurph26
 
@@ -70,15 +70,15 @@ Hire me!
       disposal asis delay 0.06s
     ....snipped....
 
-* Costa Rican snake
+* Costa Rican snake (~681 KB)
 
 .code van/snake.go 
 
-* seneca: Process of creation
+* seneca: 3-step process
 
 1. Install seneca & ffmpeg
 
-.link http://ffmpeg.org/ ffmpeg.org
+.link http://ffmpeg.org/ ffmpeg 2.1.4
 .link https://github.com/javouhey/seneca github.com/javouhey/seneca
 
 2. Download mp4 / flv
@@ -97,8 +97,9 @@ Hire me!
        Duration: 145
     Size  (wxh): 426x240
     Fps (Hertz): 23.980000
+    ... snipped ...
 
-4. Optimize generated animated GIF using tools e.g. gifsicle
+#Extra step: Optimize generated animated GIF using tools e.g. gifsicle
 
 * Changing speed (slow=3.7MB vs. veryfast=1.5MB)
 
@@ -110,7 +111,35 @@ Hire me!
 
 * Lesson #1: empty struct
 
-- speed argument checker using a map
+Problem: modelling a set of values
+
+.code van/speed1.go
+
+* Lesson #1: empty struct (cont.)
+
+An empty struct has zero memory allocations.
+
+.code van/speed2.go
+
+Two different interpretation:
+
+- `interface{}` stands for the concept of `Any`
+- `struct{}` stands for the concept of `Nothing`
+
+* Lesson #1: empty struct (cont.)
+
+Next incarnation of my map:
+
+.code van/speed3.go
+
+More idiomatic:
+
+    var speeds = map[string]bool { ... }
+
+    arg := "placebo"
+    if speeds[arg] {
+        // arg exists in `speeds`
+    }
 
 * Scaling (4.9MB)
 
@@ -118,47 +147,64 @@ Hire me!
 
 - 6MB file rejected by imgur.
 .code van/zlatan.go HLspe
-- The *"_"* placeholder inspired by `Go`
-    -scale _:_     (means no scaling)
+- The *_* placeholder inspired by `Go`
+    -scale _:_     
     -scale 203:405 (INVALID)
 # libx264 encoder only accepts even dimensions.
 
-* Lesson #2: Typed safe Enums
+* Lesson #2: Type-safe Enums
 
-Unicorn
+- Go does not have type-safe enums. 
+
+.code van/scale.go
+
+    fmt.Printf("%d %d %d", WidthOnly, HeightOnly, WidthHeight)
+
+Output
+
+    1 2 4
+
+* Lesson #2: Type-safe Enums (cont.)
+
+.code van/scale2.go
+
+- This does not limit the scope of values:
+
+    Rescale(1)
+    Rescale(WidthOnly)
+    Rescale(99)
+
+Output
+
+    1
+    1
+    99
+
+* Lesson #2: Type-safe Enums (cont.)
+
+Solution: implement range checks for the type of your constants.
+
+.code van/scalefix.go
+
+.link http://play.golang.org/p/zlpORmC3u1 play.golang.org/p/zlpORmC3u1
 
 * Lesson #3: Building HTTP servers is a cinch
 
 - *Problem* `ffmpeg` may take a long time to complete.
-- *Solution*
 
     $ ffmpeg -progress http://host:port ...
 
 Listen for pings:
 
-    POST / HTTP/1.1
-    Transfer-Encoding: chunked
-    User-Agent: Lavf/55.30.100
-
-    84
-    frame=0
-    drop_frames=0
-    progress=continue
-
-    ...snipped...
-
-    89
-    frame=108
-    drop_frames=103
-    progress=end
+.code van/pings.go
 
 * Lesson #3: Goroutine HTTP Listener (cont.)
 # why is it a pointer to channel. Can it be normal reference type ?
 .code van/progress.go 
 
 - *Responsibilities*: 
-- _Listens for `ffmpeg` pings on port 8080 (default)
-- _Forwards statuses to the Status Logger.
+- a) Listens for `ffmpeg` pings on port 8080 (default)
+- b) Forwards statuses to the Status Logger.
 
 * Lesson #3: Goroutine Status Logger (cont.)
 
@@ -175,6 +221,12 @@ Listen for pings:
 - A closed channel can only be read from, writing to it panics. (_Discuss_) 
 #in seneca, I close the TCP listener first before closing the channel
 #closing should be done by the sender, never the receiver.
+
+* Interlude
+
+.link http://www.reddit.com/user/BigMurph26 www.reddit.com/user/BigMurph26
+
+.image y0yUSUL-iceland.gif 310 800
 
 * Communicating with goroutines
 
@@ -193,7 +245,7 @@ Listen for pings:
 
 .code van/task1.go
 
-- method *Run* returns an unbuffered channel of type
+- `Run` returns an unbuffered channel
 
     <-chan error
 
@@ -206,7 +258,7 @@ Listen for pings:
         err error
     }
 
-- method *Run* returns a `*sync.WaitGroup`
+- `Run` returns a `*sync.WaitGroup`
 #WaitGroup is a struct and behaves like a counting semaphore
 
 .code van/task2.go
@@ -252,9 +304,10 @@ Output
 
 .code van/tomb2.go
 
+
 * Lesson #4: build process
 
-- Want: Ability to maintain a symbolic version:
+- Maintain a symbolic version:
 
    $ seneca -version
 
@@ -262,8 +315,8 @@ Output:
 
    Seneca version 1.0.0-beta3, git SHA 4d95362aff7a9a5ab1b9cd677c272c10e3b52a09
 
-- Want: Reduction in the size of the binary
-.link https://code.google.com/p/go/issues/detail?id=6853 Issue 6853 Binaries too big and growing
+- Smaller binary size 
+.link https://code.google.com/p/go/issues/detail?id=6853 Issue #6853 : Binaries too big and growing
 # tagged for go1.4
 
 .image van/exe-size.png
@@ -272,15 +325,24 @@ Output:
 
 .image van/dir-mysources.png
 
+This still *works* but ...
+
+    $ go get -x github.com/javouhey/seneca
+
 * Lesson #4: build process (cont.)
 
 .image van/dir-src-symbolic-link.png
 
 .code van/build.go
+# -w removes the DWARF information which allows for debugging
 
 Inspired by:
 
 .link https://github.com/coreos/etcd github.com/coreos/etcd
+
+* Interlude
+
+.image NataliaPoklonskaya-Ukraine-AG.gif 400 650
 
 * Lesson #5: Reproducible builds
 
@@ -290,9 +352,10 @@ Inspired by:
 - Tip of default branch always pristine ?
 - 12-factor app rule:
 
+.link http://12factor.net/dependencies 12factor.net/dependencies
+
     Explicitly declare and isolate dependencies 
 
-.link http://12factor.net/dependencies 12factor.net/dependencies
 
 * Lesson #5: Put the version explicitly in the import path
 
@@ -310,7 +373,7 @@ will pull down the new fixes/improvement to `v4` (stable API)
 
 .code van/gopkg1.go
 
-*Limitation:* Github hosted packages only
+*Constraint* Github hosted packages only
 
 * Lesson #5: Git submodules
 
@@ -339,26 +402,13 @@ Take 3rd party code & check it into your project's repo.
     )
 
 - These projects vendor their dependencies.
-    github.com/dotcloud/docker
-    github.com/coreos/etcd
-
-* Potpourri 
-
-- Mistakes made: Return sync.WaitGroup instead of *sync.WaitGroup
-  https://groups.google.com/forum/#!topic/golang-nuts/yF1plSkha5w
-
-- Cross-platform functions only in `"path/filepath"`
-- Should I `panic` ?
-- .. even when a package uses panic internally, its external API still presents explicit error return values.
-    func (b *Buffer) WriteString(s string) (n int, err error)
-- .. err is always nil. If the buffer becomes too large, WriteString will panic with ErrTooLarge. 
-- placeholder
+    dotcloud/docker    coreos/etcd    bradfitz/camlistore
 
 * seneca: Future
 
 .image eastwood.gif 250 426
 
-- Support for subtitles (via `libass` in ffmpeg)
+- Support subtitling (via `libass` in `ffmpeg`)
 # Advanced Substation Alpha
 - auto-upload
 

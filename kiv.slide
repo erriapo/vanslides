@@ -1,0 +1,12 @@
+1 * Potpourri
+362
+363 - Mistakes made: Return sync.WaitGroup instead of *sync.WaitGroup
+364   https://groups.google.com/forum/#!topic/golang-nuts/yF1plSkha5w
+365
+366 - Cross-platform functions only in `"path/filepath"`
+367 - Should I `panic` ?
+368 - .. even when a package uses panic internally, its external API still presents explicit e    rror return values.
+369     func (b *Buffer) WriteString(s string) (n int, err error)
+370 - .. err is always nil. If the buffer becomes too large, WriteString will panic with ErrTo    oLarge.
+371 - placeholder
+

@@ -3,8 +3,8 @@ var (
        vr    *io.VideoReader
 )
 
-wg := task2.Run(vr, args)
-wg.Wait() // HL
+pWg := task2.Run(vr, args)
+pWg.Wait() // HL
 if err := task2.Error(); err != nil { // HL
     syscall.Exit(126)
 }
