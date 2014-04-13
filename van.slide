@@ -2,9 +2,7 @@ Creating Animated GIFs
 Golang Vancouver meetup 
 9 Apr 2014
 
-Gavin <raverunner@gmail.com> 
 @javouhey
-Hire me!
 
 * Motivation
 
@@ -427,3 +425,12 @@ Take 3rd party code & check it into your project's repo.
              -port 8181 -from 00:01:19 -length=4s -speed=slower 
 
 # -from 00:01:15 -length=3s
+
+* Noteworthy software
+
+.link http://godoc.org/labix.org/v2/pipe godoc.org/labix.org/v2/pipe
+.link https://launchpad.net/tomb launchpad.net/tomb
+.link http://godoc.org/git.tideland.biz/goas/loop godoc.org/git.tideland.biz/goas/loop
+.link https://github.com/bradfitz/iter github.com/bradfitz/iter
+.link https://github.com/niemeyer/gopkg github.com/niemeyer/gopkg
+.link https://github.com/coreos/etcd github.com/coreos/etcd
